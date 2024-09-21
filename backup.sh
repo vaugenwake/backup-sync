@@ -31,6 +31,11 @@ if [[ $NOTVALID == 1 ]]; then
   exit 1
 fi
 
+if [[ ! -d "/tmp/backups" ]]; then
+  echo "Temp backup dir does not exist, creating it"
+  mkdir /tmp/backups
+fi
+
 printf "Reading secrets\n"
 
 MYSQL_PASSWORD=$(cat $BACKUP_MYSQL_PASSWORD_FILE) || 0

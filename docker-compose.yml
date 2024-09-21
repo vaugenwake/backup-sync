@@ -22,7 +22,6 @@ services:
     volumes:
       - .:/app
       - ./secrets:/var/run/secrets
-      - ./backups:/tmp/backups
     environment:
       - BACKUP_MYSQL_HOST=backup-test
       - BACKUP_MYSQL_PORT=3306
