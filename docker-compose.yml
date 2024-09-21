@@ -1,0 +1,41 @@
+name: backup_sync
+
+services:
+  backup-test:
+    image: mysql:latest
+    ports:
+      - 33033:3306
+    volumes:
+      - ./secrets:/var/run/secrets
+      - ./fakedata:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_ROOT_PASSWORD_FILE=/var/run/secrets/rootpwd
+      - MYSQL_PASSWORD_FILE=/var/run/secrets/userpwd
+      - MYSQL_USER=backupuser
+      - MYSQL_DATABASE=mydb
+    networks:
+      - backup
+
+  script:
+    build:
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - ./secrets:/var/run/secrets
+      - ./backups:/tmp/backups
+    environment:
+      - BACKUP_MYSQL_HOST=backup-test
+      - BACKUP_MYSQL_PORT=3306
+      - BACKUP_MYSQL_PASSWORD_FILE=/var/run/secrets/userpwd
+      - BACKUP_MYSQL_USER=backupuser
+      - BACKUP_MYSQL_DATABASE=mydb
+      - AWS_DEFAULT_REGION=eu-west-1
+      - AWS_S3_BUCKET_NAME=tradigital-db-backups
+      - AWS_ACCESS_KEY_FILE=/var/run/secrets/accesskey
+      - AWS_SECRET_KEY_FILE=/var/run/secrets/secret
+      - S3_BACKUP_SUBDIRECTORY=myapp
+    networks:
+      - backup
+
+networks:
+  backup:
